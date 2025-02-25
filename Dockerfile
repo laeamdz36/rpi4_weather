@@ -1,5 +1,5 @@
 # Docker file to execute aplication for sensor reading from BME280
-FROM python:3.13.1
+FROM python:3.13.1-alpine3.21
 WORKDIR /app
 COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
