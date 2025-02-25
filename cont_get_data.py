@@ -1,13 +1,16 @@
 """Module for continous get data from Sensor BME"""
 
 import datetime as dt
+from time import sleep
 import os
 
 
 def dev_logger_time():
     """For development testing call this function to print time"""
+    while True:
+        print(dt.datetime.now())
+        sleep(2)
 
-    print(dt.datetime.now())
 
 def get_env_mode():
     """Get the env variable "RUNMODE", to check if deploy is in dev or production"""

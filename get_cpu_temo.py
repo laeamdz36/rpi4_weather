@@ -8,6 +8,7 @@ def get_cpu_temp():
 
     cpu = CPUTemperature()
     print(f"Current temperature: {cpu.temperature}")
+    return cpu.temperature
 
 if __name__ == "__main__":
     get_cpu_temp()

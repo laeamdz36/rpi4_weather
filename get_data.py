@@ -5,17 +5,24 @@ import smbus2
 # from time import sleep
 
 # adding comment
+def read_sensor():
+    """Read sensor BME 280 in  76"""
+    port = 1
+    address = 0x76  # Adafruit BME280 address. Other BME280s may be different
+    bus = smbus2.SMBus(port)
 
-port = 1
-address = 0x76  # Adafruit BME280 address. Other BME280s may be different
-bus = smbus2.SMBus(port)
+    bme280.load_calibration_params(bus, address)
 
-bme280.load_calibration_params(bus, address)
+    bme280_data = bme280.sample(bus, address)
+    time_stamp = f"Tiempo: {bme280_data.timestamp}"
+    humidity = f"Humedad actual: {bme280_data.humidity} %"
+    pressure = f"Presion actual: {bme280_data.pressure} hPa"
+    ambient_temperature = f"Temperatura: {bme280_data.temperature} °C"
 
-bme280_data = bme280.sample(bus, address)
-time_stamp = f"Tiempo: {bme280_data.timestamp}"
-humidity = f"Humedad actual: {bme280_data.humidity} %"
-pressure = f"Presion actual: {bme280_data.pressure} hPa"
-ambient_temperature = f"Temperatura: {bme280_data.temperature} °C"
+    print(time_stamp, humidity, pressure, ambient_temperature, sep="\n")
 
-print(time_stamp, humidity, pressure, ambient_temperature, sep="\n")
+    return {"humidity": humidity, "pressure": pressure,
+            "ambient_temperature": ambient_temperature, }
+
+if __name__ == "__main__":
+    read_sensor()
