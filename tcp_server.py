@@ -17,22 +17,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     while True:
         # Acpetar conexion entrante
         client_socket, client_address = server.accept()
-        now = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        transmit_data = {
-            "Device": "Raspberry_001",
-            "STATUS": "Running",
-            "current_time": now
-        }
         while True:
             try:
 
+                now = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                transmit_data = {
+                    "Device": "Raspberry_001",
+                    "STATUS": "Running",
+                    "current_time": now
+                }
                 print(f"Conexion establecida con {client_address}")
 
                 # Send data over TCP socket
                 response_json = json.dumps(transmit_data)
                 client_socket.sendall(response_json.encode("utf-8"))
                 print(f"enviando respuesta {response_json}")
-                time.sleep(5)
+                time.sleep(1)
             except ConnectionResetError:
                 break
 
