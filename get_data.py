@@ -20,6 +20,17 @@ def en_relay():
     time.sleep(1)
 
 
+def blink_relay():
+    """testing blinking relay"""
+
+    relay = LED(17)
+    for i in range(10):
+        relay.on()
+        time.sleep(1)
+        relay.off()
+        time.sleep(1)
+
+
 def read_sensor():
     """Read sensor BME 280 in  76"""
     port = 1
@@ -42,4 +53,5 @@ def read_sensor():
 
 if __name__ == "__main__":
     read_sensor()
-    en_relay()
+    # en_relay()
+    blink_relay()
