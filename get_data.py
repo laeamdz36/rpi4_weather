@@ -29,6 +29,8 @@ def blink_relay():
     time.sleep(1)
     relay.toggle()
     time.sleep(1)
+    relay.toggle()
+    time.sleep(1)
 
     # relay.blink(on_time=1, off_time=1, background=True)
 
