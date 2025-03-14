@@ -53,4 +53,4 @@ def read_sensor():
 if __name__ == "__main__":
     read_sensor()
     # en_relay()
-    blink_relay()
+    # blink_relay()
