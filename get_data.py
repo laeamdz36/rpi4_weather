@@ -25,8 +25,17 @@ def blink_relay():
     """testing blinking relay"""
 
     relay = LED(17)
-    relay.blink(on_time=1, off_time=1, background=True)
-    pause()
+    relay.toggle()
+    time.sleep(1)
+    relay.toggle()
+    time.sleep(1)
+    relay.toggle()
+    time.sleep(1)
+    relay.toggle()
+    time.sleep(1)
+    relay.toggle()
+    time.sleep(1)
+    # relay.blink(on_time=1, off_time=1, background=True)
 
 
 def read_sensor():
