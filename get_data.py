@@ -3,6 +3,7 @@
 import bme280
 import smbus2
 from gpiozero import LED
+from signal import pause
 import time
 # from time import sleep
 
@@ -25,6 +26,7 @@ def blink_relay():
 
     relay = LED(17)
     relay.blink(on_time=1, off_time=1, n=10, background=True)
+    pause()
 
 
 def read_sensor():
