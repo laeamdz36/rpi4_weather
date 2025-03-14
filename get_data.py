@@ -2,9 +2,24 @@
 
 import bme280
 import smbus2
+from gpiozero import LED
+import time
 # from time import sleep
 
-# adding comment
+
+def en_relay():
+    """Testing reading GPIO"""
+
+    rel1 = LED(17)
+
+    rel1.on()
+    time.sleep(3)
+    rel1.off()
+    time.sleep(1)
+    rel1.on()
+    time.sleep(1)
+
+
 def read_sensor():
     """Read sensor BME 280 in  76"""
     port = 1
@@ -24,5 +39,7 @@ def read_sensor():
     return {"humidity": humidity, "pressure": pressure,
             "ambient_temperature": ambient_temperature, }
 
+
 if __name__ == "__main__":
     read_sensor()
+    en_relay()
