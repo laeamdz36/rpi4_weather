@@ -1,9 +1,6 @@
 #!/bin/bash
 
-source "~/app_weather_1/.venv/bin/activate"
+source "$(dirname "$0")/.venv/bin/activate"
+python "$(dirname "$0")/get_data.py"
 
-# Ejecuta el script Python (por ejemplo 'main.py')
-python "~/app_weather_1//get_data.py"
-
-# Opcional: desactiva el entorno virtual al finalizar
 deactivate
