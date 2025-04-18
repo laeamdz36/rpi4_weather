@@ -8,7 +8,8 @@ services:
     image: pyreader:1.0.0
     container_name: py_readbme
     devices:
-      - "/sys/bus/i2c/devices/i2c-1:/sys/bus/i2c/devices/i2c-1"
-      - "/sys/bus/i2c/devices/i2c-2:/sys/bus/i2c/devices/i2c-2"
+      - "/dev/i2c-1:/dev/i2c-1"
+      - "/dev/i2c-2:/dev/i2c-2"
+    #priviliged: True
     cap_add:
       - SYS_RAWIO
