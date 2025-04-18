@@ -1,0 +1,14 @@
+name: read_bme280
+
+services:
+  py_reader:
+    build:
+      context: .
+      dockerfile: dockerfile.pyreadbme
+    image: pyreader:1.0.0
+    container_name: py_readbme
+    devices:
+      - "/sys//sys/bus/i2c/devices/i2c-1:/sys//sys/bus/i2c/devices/i2c-1"
+      - "/sys//sys/bus/i2c/devices/i2c-2:/sys//sys/bus/i2c/devices/i2c-2"
+    cap_add:
+      - SYS_RAWIO

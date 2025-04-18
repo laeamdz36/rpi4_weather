@@ -51,6 +51,9 @@ def read_sensor():
 
 
 if __name__ == "__main__":
-    read_sensor()
-    # en_relay()
-    # blink_relay()
+
+    while True:
+        try:
+            read_sensor()
+        except Exception as e:
+            print(f"Exception has occured {e.args}")
