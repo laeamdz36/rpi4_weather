@@ -15,7 +15,7 @@ def get_cpu_temp():
 
     cpu = CPUTemperature()
     print(f"Current temperature: {cpu.temperature}")
-    return cpu.temperature
+    return round(float(cpu.temperature), 2)
 
 
 def read_sensor():
@@ -25,19 +25,23 @@ def read_sensor():
     bus = smbus2.SMBus(port)
 
     bme280.load_calibration_params(bus, address)
-
     bme280_data = bme280.sample(bus, address)
-    time_stamp = f"Tiempo: {bme280_data.timestamp}"
-    humidity = f"Humedad actual: {bme280_data.humidity} %"
-    pressure = f"Presion actual: {bme280_data.pressure} hPa"
-    ambient_temperature = f"Temperatura: {bme280_data.temperature} °C"
+    # data asignation
+    temperature = round(float(bme280_data.temperature), 2)
+    humidity = round(float(bme280_data.humidity), 2)
+    pressure = round(float(bme280_data.pressure), 2)
+    # logging
+    t_stamp_lg = f"Tiempo: {bme280_data.timestamp}"
+    hum_lg = f"Humedad actual: {humidity} %"
+    press_lg = f"Presion actual: {pressure} hPa"
+    temp_lg = f"Temperatura: {temperature} °C"
     now = dt.datetime.today()
     head = now.strftime("%d/%m/%Y %H%M%S")
     print(head.center(50, "="))
-    print(time_stamp, humidity, pressure, ambient_temperature, sep="\n")
+    print(t_stamp_lg, hum_lg, press_lg, temp_lg, sep="\n")
 
     return {"humidity": humidity, "pressure": pressure,
-            "temperature": ambient_temperature, }
+            "temperature": temperature, }
 
 
 def write_data(data: dict):
@@ -60,14 +64,15 @@ def write_data(data: dict):
     # measurement: weather, location = Office
     # field tags: Temperature, Pressure, Humidity
     #
-    point = influxdb_client.Point("weather").tag(
+    weather = influxdb_client.Point("weather").tag(
         "location", "office").field(
-            "temperature", data["temperature"]).tag(
-            "humidity", data["humidity"]).tag(
+            "temperature", data["temperature"]).field(
+            "humidity", data["humidity"]).field(
             "pressure", data["pressure"]
     )
+    # cpu_temp = get_cpu_temp()
 
-    write_api.write(bucket=bucket, org=org, record=point)
+    write_api.write(bucket=bucket, org=org, record=weather)
 
 
 if __name__ == "__main__":
