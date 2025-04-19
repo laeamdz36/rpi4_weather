@@ -1,5 +1,6 @@
 """Module for reading data for raspberry PI SPI interface sensor"""
 
+import datetime as dt
 import bme280
 import smbus2
 from gpiozero import LED
@@ -43,7 +44,9 @@ def read_sensor():
     humidity = f"Humedad actual: {bme280_data.humidity} %"
     pressure = f"Presion actual: {bme280_data.pressure} hPa"
     ambient_temperature = f"Temperatura: {bme280_data.temperature} °C"
-
+    now = dt.datetime.today()
+    head = now.strftime("%d%m%Y %H%M%S")
+    print(head.center(50, "="))
     print(time_stamp, humidity, pressure, ambient_temperature, sep="\n")
 
     return {"humidity": humidity, "pressure": pressure,
