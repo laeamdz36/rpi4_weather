@@ -51,6 +51,14 @@ services:
     cap_add:
       - SYS_RAWIO
 
+  grafana:
+    image: grafana/grafana-enterprise:11.6.0
+    container_name: Grafanadev1
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+
 secrets:
   influxdb2-admin-username:
     file: ./.env.influxdb2-admin-username
@@ -61,3 +69,4 @@ secrets:
 volumes:
   influxdb2-data:
   influxdb2-config:
+  grafana-data:

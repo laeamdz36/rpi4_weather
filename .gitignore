@@ -2,6 +2,7 @@
 .idea
 weather.db
 /db_data
+.todo
 
 .env.influxdb2-admin-password
 .env.influxdb2-admin-token
