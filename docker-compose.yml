@@ -4,6 +4,7 @@ services:
   influxdb2:
     image: influxdb:2.7.11
     container_name: Influx2
+    restart: always
     ports:
       - 8086:8086
     environment:
@@ -33,6 +34,7 @@ services:
       dockerfile: dockerfile.pyreadbme
     image: pyreader:1.0.0
     container_name: py_readbme
+    restart: always
     depends_on:
       - influxdb2
     environment:
@@ -47,13 +49,23 @@ services:
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/i2c-2:/dev/i2c-2"
+      # General propuse IO
+      - /dev/gpiomem:/dev/gpiomem
+      # PMW
+      - /dev/vcio:/dev/vcio
+      # Para componente ADS MCP3008
+      - /dev/spidev0.0:/dev/spidev0.0
+      - /dev/spidev0.1:/dev/spidev0.1
     #priviliged: True
     cap_add:
       - SYS_RAWIO
+    volumes:
+      - /sys/class/thermal:/sys/class/thermal:ro
 
   grafana:
     image: grafana/grafana-enterprise:11.6.0
     container_name: Grafanadev1
+    restart: always
     ports:
       - 3000:3000
     volumes:

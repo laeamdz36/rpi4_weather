@@ -3,7 +3,10 @@
 weather.db
 /db_data
 .todo
-
+# Bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
 .env.influxdb2-admin-password
 .env.influxdb2-admin-token
 .env.influxdb2-admin-username
