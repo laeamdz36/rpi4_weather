@@ -104,7 +104,7 @@ def create_mqtt_client():
     client = mqtt.Client(client_id="rp1")
     client.username_pw_set(username, password)
     client.connect(BROKER, PORT, 60)
-    # client.loop_start()
+    client.loop_start()
     return client
 
 
@@ -112,7 +112,6 @@ def pub_mqtt(client, data):
     """Publish MQTT"""
 
     _topics = load_topics()
-    recconect = False
     try:
         cputemp = get_cpu_temp()
         if cputemp:
@@ -125,10 +124,6 @@ def pub_mqtt(client, data):
 
     except Exception as e:
         print(f"ERROR: {e.args}")
-    finally:
-        client.disconnect()
-        recconect = True
-    return recconect
 
 
 if __name__ == "__main__":
@@ -142,9 +137,7 @@ if __name__ == "__main__":
             # write data into influxdb
             write_data(data_point)
             # publish data to MQTT
-            recconect = pub_mqtt(_client, data_point)
-            if recconect:
-                _client = create_mqtt_client()
+            pub_mqtt(_client, data_point)
             sleep(5)
         except Exception as e:
             print(f"Exception has occured {e.args}")
