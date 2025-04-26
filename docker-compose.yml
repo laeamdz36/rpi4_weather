@@ -54,9 +54,9 @@ services:
       # PMW
       - /dev/vcio:/dev/vcio
       # Para componente ADS MCP3008
-      - /dev/spidev0.0:/dev/spidev0.0
-      - /dev/spidev0.1:/dev/spidev0.1
-    #priviliged: True
+      #- /dev/spidev0.0:/dev/spidev0.0
+      #- /dev/spidev0.1:/dev/spidev0.1
+      #priviliged: True
     cap_add:
       - SYS_RAWIO
     volumes:
