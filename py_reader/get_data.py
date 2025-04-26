@@ -114,13 +114,12 @@ def pub_mqtt(client, data):
     try:
         cputemp = get_cpu_temp()
         if cputemp:
-            client.publish("rp2/system/cpu_temp", cputemp)
-        print(f"PUB: rp2/system/cpu_temp - {cputemp}")
+            client.publish("rp1/system/cpu_temp", cputemp)
+        print(f"PUB: rp1/system/cpu_temp - {cputemp}")
         for sensor, value in data.items():
             client.publish(_topics.get(sensor)["topic"], value)
             print(
                 f"Pub topic: {_topics.get(sensor)["topic"]}, val: {value}")
-        sleep(5)
     except Exception as e:
         print(f"ERROR: {e.args}")
     finally:
