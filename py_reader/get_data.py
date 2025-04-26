@@ -101,9 +101,10 @@ def create_mqtt_client():
     PORT = 1883
     username = "mqtt_usr"
     password = "luismdz366"
-    client = mqtt.Client()
+    client = mqtt.Client(client_id="rp1")
     client.username_pw_set(username, password)
     client.connect(BROKER, PORT, 60)
+    client.loop_start()
     return client
 
 
