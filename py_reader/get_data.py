@@ -120,10 +120,11 @@ def create_mqtt_client():
     PORT = 1883
     username = "mqtt_usr"
     password = "luismdz366"
-    client = mqtt.Client(client_id="rp1")
-    client.username_pw_set(username, password)
     stat = False
+    client = False
     try:
+        client = mqtt.Client(client_id="rp1")
+        client.username_pw_set(username, password)
         client.connect(BROKER, PORT, 60)
         stat = True
         client.loop_start()
@@ -179,7 +180,8 @@ if __name__ == "__main__":
             log.error("Occurred error %s", e)
             log.error("Error: %s", exc_info=True)
         try:
-            pub_mqtt(_client, data_point)
+            if _client is not False:
+                pub_mqtt(_client, data_point)
         except Exception as e:
             log.error("Occurred error %s", e)
             log.error("Error: %s", exc_info=True)
