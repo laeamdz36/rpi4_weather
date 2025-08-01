@@ -122,9 +122,14 @@ def create_mqtt_client():
     password = "luismdz366"
     client = mqtt.Client(client_id="rp1")
     client.username_pw_set(username, password)
-    client.connect(BROKER, PORT, 60)
-    client.loop_start()
-    return client
+    stat = False
+    try:
+        client.connect(BROKER, PORT, 60)
+        stat = True
+        client.loop_start()
+    except Exception:
+        log.error("Connection Error to Broker MQTT %s", BROKER)
+    return client, stat
 
 
 def pub_mqtt(client, data):
@@ -149,8 +154,12 @@ def pub_mqtt(client, data):
 if __name__ == "__main__":
 
     Device.pin_factory = NativeFactory()
-    _client = create_mqtt_client()
+    _client, conn_stat = create_mqtt_client()
     while True:
+
+        if conn_stat is False:
+            _client, conn_stat = create_mqtt_client()
+
         try:
             # read sensor BME280
             data_point = read_sensor()
