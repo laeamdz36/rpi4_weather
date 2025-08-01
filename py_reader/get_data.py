@@ -1,6 +1,8 @@
 """Module for reading data for raspberry PI SPI interface sensor"""
 
 import os
+import logging
+import sys
 from time import sleep
 import datetime as dt
 import bme280
@@ -13,15 +15,32 @@ import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 
+def init_logger():
+    """Configure and return the logger instance"""
+
+    # get configure logger
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)]
+    )
+    return logging.getLogger("weather_app")
+
+
+# Dinition of global logger
+log = init_logger()
+
+
 def get_cpu_temp():
     """Reading temperature from CPU"""
     cpu = None
     try:
         cpu = CPUTemperature()
-        print(f"Current temperature: {cpu.temperature}")
+        log.info("Current temperature: %s", cpu.temperature)
         cpu = round(float(cpu.temperature), 2)
     except Exception as e:
-        print(f"Error: {e.args}")
+        log.error("Occurred error %s", e)
+        log.error("Error: %s", exc_info=True)
     return cpu
 
 
@@ -42,10 +61,10 @@ def read_sensor():
     hum_lg = f"Humedad actual: {humidity} %"
     press_lg = f"Presion actual: {pressure} hPa"
     temp_lg = f"Temperatura: {temperature} °C"
-    now = dt.datetime.today()
-    head = now.strftime("%d/%m/%Y %H%M%S")
-    print(head.center(50, "="))
-    print(t_stamp_lg, hum_lg, press_lg, temp_lg, sep="\n")
+    log.info("Sensor tstamp %s", t_stamp_lg)
+    log.info("Sensor humidity %s", hum_lg)
+    log.info("Sensor pressure %s", press_lg)
+    log.info("Sensor temperature %s", temp_lg)
 
     return {"humidity": humidity, "pressure": pressure,
             "temperature": temperature, }
@@ -116,14 +135,15 @@ def pub_mqtt(client, data):
         cputemp = get_cpu_temp()
         if cputemp:
             client.publish("rp1/system/cpu_temp", cputemp)
-        print(f"PUB: rp1/system/cpu_temp - {cputemp}")
+        log.info("MQTT PUB: rp1/system/cpu_temp %s", cputemp)
         for sensor, value in data.items():
             client.publish(_topics.get(sensor)["topic"], value)
-            print(
-                f"Pub topic: {_topics.get(sensor)["topic"]}, val: {value}")
+            log.info("Publish topic : %s, value %s",
+                     _topics.get(sensor)["topic"], value)
 
     except Exception as e:
-        print(f"ERROR: {e.args}")
+        log.error("Occurred error %s", e)
+        log.error("Error: %s", exc_info=True)
 
 
 if __name__ == "__main__":
@@ -134,10 +154,24 @@ if __name__ == "__main__":
         try:
             # read sensor BME280
             data_point = read_sensor()
-            # write data into influxdb
-            write_data(data_point)
-            # publish data to MQTT
-            pub_mqtt(_client, data_point)
-            sleep(5)
         except Exception as e:
-            print(f"Exception has occured {e.args}")
+            log.error("Occurred error %s", e)
+            log.error("Error: %s", exc_info=True)
+            data_point = None
+        try:
+            # write data into influxdb
+            if data_point is not None:
+                write_data(data_point)
+            else:
+                print(f"No data content in Sensor {data_point}")
+                log.info("No data in sensor reading -> %s", data_point)
+            # publish data to MQTT
+        except Exception as e:
+            log.error("Occurred error %s", e)
+            log.error("Error: %s", exc_info=True)
+        try:
+            pub_mqtt(_client, data_point)
+        except Exception as e:
+            log.error("Occurred error %s", e)
+            log.error("Error: %s", exc_info=True)
+        sleep(5)

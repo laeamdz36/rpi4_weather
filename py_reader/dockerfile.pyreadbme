@@ -4,4 +4,4 @@ COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 ENV RUNMODE=prod
-CMD ["python", "get_data.py"]
+CMD ["python", "-u", "get_data.py"]
