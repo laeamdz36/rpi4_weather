@@ -109,3 +109,4 @@ volumes:
   influxdb2-data:
   influxdb2-config:
   grafana-data:
+  prometheus_data:
