@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 5s
+
+# aplicacion python
+scrape_configs:
+  - job_name: 'py-app'
+    static_configs:
+      - targets: ['py_readbme:9101']  # o 'localhost:8000' si estás fuera de Docker
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']

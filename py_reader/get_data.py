@@ -13,6 +13,15 @@ from gpiozero.pins.native import NativeFactory
 from gpiozero import Device
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
+from prometheus_client import start_http_server, Counter, Gauge, Summary
+
+# Setting prometheus instruments
+MAIN_LOOP = Summary("main_loop_exec", "Sumary main Execution")
+READ_SENSOR = Summary("reading_sensor", "Reading sensor for BME280")
+WRITE_INFLUXDB = Summary("write_to_influxdb", "Sumary writing INFLUXDB")
+PUB_MQTT = Summary("pub_mqtt_bloker", "Summary Pub to MQTT")
+FAILS_INFLUXDB = Counter("error_write_influxdb", "Failures to write InfluxDB")
+FAILS_MQTT = Counter("error_pub_mqtt", "Failures to write MQTT")
 
 
 def init_logger():
@@ -27,7 +36,7 @@ def init_logger():
     return logging.getLogger("weather_app")
 
 
-# Dinition of global logger
+# Definition of global logger
 log = init_logger()
 
 
@@ -44,6 +53,7 @@ def get_cpu_temp():
     return cpu
 
 
+@READ_SENSOR.time()
 def read_sensor():
     """Read sensor BME 280 in  76"""
     port = 1
@@ -70,6 +80,7 @@ def read_sensor():
             "temperature": temperature, }
 
 
+@WRITE_INFLUXDB.time()
 def write_data(data: dict):
     """Write data into influxDB container"""
 
@@ -133,6 +144,7 @@ def create_mqtt_client():
     return client, stat
 
 
+@PUB_MQTT.time()
 def pub_mqtt(client, data):
     """Publish MQTT"""
 
@@ -152,37 +164,46 @@ def pub_mqtt(client, data):
         log.error("Error: %s", exc_info=True)
 
 
+@MAIN_LOOP.time()
+def main(client, stat):
+    """Main execution loop"""
+
+    if stat is False:
+        client, stat = create_mqtt_client()
+
+    try:
+        # read sensor BME280
+        data_point = read_sensor()
+    except Exception as e:
+        log.error("Occurred error %s", e)
+        log.error("Error: %s", exc_info=True)
+        data_point = None
+    try:
+        # write data into influxdb
+        if data_point is not None:
+            write_data(data_point)
+        else:
+            print(f"No data content in Sensor {data_point}")
+            log.info("No data in sensor reading -> %s", data_point)
+        # publish data to MQTT
+    except Exception as e:
+        log.error("Occurred error %s", e)
+        log.error("Error: %s", exc_info=True)
+        FAILS_MQTT.inc()
+    try:
+        if client is not False:
+            pub_mqtt(client, data_point)
+    except Exception as e:
+        log.error("Occurred error %s", e)
+        log.error("Error: %s", exc_info=True)
+        FAILS_INFLUXDB.inc()
+
+
 if __name__ == "__main__":
 
     Device.pin_factory = NativeFactory()
     _client, conn_stat = create_mqtt_client()
+    start_http_server(9101)
     while True:
-
-        if conn_stat is False:
-            _client, conn_stat = create_mqtt_client()
-
-        try:
-            # read sensor BME280
-            data_point = read_sensor()
-        except Exception as e:
-            log.error("Occurred error %s", e)
-            log.error("Error: %s", exc_info=True)
-            data_point = None
-        try:
-            # write data into influxdb
-            if data_point is not None:
-                write_data(data_point)
-            else:
-                print(f"No data content in Sensor {data_point}")
-                log.info("No data in sensor reading -> %s", data_point)
-            # publish data to MQTT
-        except Exception as e:
-            log.error("Occurred error %s", e)
-            log.error("Error: %s", exc_info=True)
-        try:
-            if _client is not False:
-                pub_mqtt(_client, data_point)
-        except Exception as e:
-            log.error("Occurred error %s", e)
-            log.error("Error: %s", exc_info=True)
+        main(_client, conn_stat)
         sleep(5)

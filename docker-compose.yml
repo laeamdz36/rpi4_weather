@@ -32,9 +32,11 @@ services:
     build:
       context: ./py_reader
       dockerfile: dockerfile.pyreadbme
-    image: pyreader:1.0.0
+    image: pyreader:1.1.0
     container_name: py_readbme
     restart: always
+    ports:
+      - 9101:9101
     depends_on:
       - influxdb2
     environment:
@@ -70,6 +72,30 @@ services:
       - 3000:3000
     volumes:
       - grafana-data:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: Prometheus
+    volumes:
+      - ./prometheus_cfg/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node_exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
 
 secrets:
   influxdb2-admin-username:
