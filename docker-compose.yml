@@ -87,8 +87,9 @@ services:
     image: prom/node-exporter:v1.9.1
     container_name: node_exporter
     restart: unless-stopped
-    network_mode: host
     pid: host
+    ports:
+      - 9100:9100
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
