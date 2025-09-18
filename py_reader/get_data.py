@@ -127,7 +127,7 @@ def load_topics(selector=None):
 def create_mqtt_client():
     """Create MQTT client to connection"""
 
-    BROKER = "192.168.68.109"
+    BROKER = "192.168.10.105"
     PORT = 1883
     username = "mqtt_usr"
     password = "luismdz366"
